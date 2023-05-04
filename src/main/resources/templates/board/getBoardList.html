@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	 
+	 <head>
+		 <th:block layout:fragment="script">
+			 <script th:inline="javascript">
+				 $(function() {
+					 $("#btnSearch").on("click", function() {
+						 $("#input[name='page']").val(0);
+						 $("#searchForm").submit();
+					 })
+				 });
+			 </script>
+		 </th:block>
+		 <th:block layout:fragment="css">
+			 <link rel="stylesheet" th:href="@{/css/getBoardList.css}"/>
+			 <style>
+				 .paging {
+					 text-align: center;
+				 }
+			 </style>
+		 </th:block>
+	 </head>
+	 <body
+		 <div layout:fragment="content">
+			 <div>
+				 <div class="topMent">
+					 <h3>게시글 목록</h3>
+					 <a th:href="@{/board/insertBoard}" id="btnWrite">새 글 작성</a>					 
+				 </div>
+				 <form id="searchForm" action="/board/boardList" method="get">
+					 <input type="hidden" name="page" value="">
+					 <table>
+						 <tr>
+							 <td>
+								 <select name="searchCondition">
+									 <option value="ALL" th:selected="${searchCondition == 'ALL'}">전체</option>
+									 <option value="TITLE" th:selected="${searchCondition == 'TITLE'}">제목</option>
+									 <option value="CONTENT" th:selected="${searchCondition == 'CONTENT'}">내용</option>
+									 <option value="WRITER" th:selected="${searchCondition == 'WRITER'}">작성자</option>
+								 </select>
+								 <input type="text" name="searchKeyword" th:value="${searchKeyword}">
+								 <button type="button" id="btnSearch">검색</button>
+							 </td>
+						 </tr>
+					 </table>
+				 </form>
+				 <table id="boardTable">
+					 <tr>
+						 <th>글 번호</th>
+						 <th>글 종류</th>
+						 <th>글 제목</th>
+						 <th>첨부파일(개수)</th>
+						 <th>작성자</th>
+						 <th>작성일</th>
+						 <th>조회수</th>
+					 </tr>
+					 <tr th:each="board: ${getBoardList}">
+						 <td th:text="${board.boardNo}"></td>
+						 <td th:if="${board.cateNo == 0}">공지</td>
+						 <td th:if="${board.cateNo == 1}">뉴스</td>
+						 <td th:if="${board.cateNo == 2}">유머</td>
+						 <td>
+							 <a th:text="${board.boardTitle}" th:href="@{/board/updateBoardCnt/{boardNo} (boardNo=${board.boardNo})}"></a>
+						 </td>
+						 <td>0</td>
+						 <td th:text="${board.boardWriter}"></td>
+						 <td th:text="${board.boardRegdate eq null ? '' : #strings.substring(board.boardRegdate, 0, 10)}"></td>
+						 <td th:text="${board.boardCnt}"></td>
+					 </tr>
+				 </table>
+				 <br/>
+<!--				 <div class="paging">
+					 <ul class="pagination" th:if="${getBoardList.totalElements > 0}"
+					 						th:with="pageNumber = ${getBoardList.pageable.pageNumber},
+					 								 pageSize = ${getBoardList.pageable.pageSize},
+					 								 totalPages = ${getBoardList.totalPages},
+					 								 startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+					 								 tempEndPage = ${startPage + pageSize - 1},
+					 								 endPage = ${tempEndPage > totalPages ? totalPages : tempEndPage}">
+					 	<li class="pagination_button" th:if="${pageNumber > 0}">
+							 <a th:href="@{/board/boardList(
+								 			page=${pageNumber - 1},
+								 			searchCondition=${searchCondition},
+								 			searchKeyword=${searchKeyword}
+							 				)}">이전</a>
+						</li>								 
+					 	<li class="pagination_button" th:each="page : ${#numbers.sequence(startPage, endPage)}">
+							 <a th:href="@{/board/boardList(
+								 			page=${pageNumber - 1},
+								 			searchCondition=${searchCondition},
+								 			searchKeyword=${searchKeyword}
+							 				)}" th:text="${page}"></a>
+						</li>								 
+					 	<li class="pagination_button" th:if="${pageNumber < totalPages - 1}">
+							 <a th:href="@{/board/boardList(
+								 			page=${pageNumber + 1},
+								 			searchCondition=${searchCondition},
+								 			searchKeyword=${searchKeyword}
+							 				)}">다음</a>
+						</li>	
+					 </ul>
+				 </div> -->
+			 </div>
+		 </div>
+	 </body>
+</html>
